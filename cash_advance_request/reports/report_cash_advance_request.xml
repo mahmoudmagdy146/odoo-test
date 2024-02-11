@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_cash_advance_request" model="report.paperformat">
+            <field name="name">Custom Paperformat for Employee Joining Report</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">10</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <record id="cash_advance_request_report_id" model="ir.actions.report">
+            <field name="name">Print Cash Advance Request</field>
+            <field name="model">hr.salary.attachment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">cash_advance_request.cash_advance_request_report_template_id</field>
+            <field name="report_file">cash_advance_request.cash_advance_request_report_template_id</field>
+            <field name="print_report_name">'Cash Advance Request'</field>
+            <field name="binding_model_id" ref="hr_payroll.model_hr_salary_attachment"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="paperformat_cash_advance_request"/>
+        </record>
+
+    </data>
+</odoo>

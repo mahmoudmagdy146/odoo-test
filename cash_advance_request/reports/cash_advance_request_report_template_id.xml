@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <template id="external_layout_standard_inherit">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+
+            <t t-if="not company">
+                <!-- Multicompany -->
+                <t t-if="company_id">
+                    <t t-set="company" t-value="company_id"/>
+                </t>
+                <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                    <t t-set="company" t-value="o.company_id.sudo()"/>
+                </t>
+                <t t-else="else">
+                    <t t-set="company" t-value="res_company"/>
+                </t>
+            </t>
+            <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                <div class="row">
+                    <div class="col-5 offset-1" name="left_data">
+                        <strong>AFC-HR-F06 V0</strong>
+                        <br/>
+                        <strong>COMPLEX FOOD ADAFNYIA</strong>
+                        <br/>
+                        <strong>Cash Advance Request</strong>
+                    </div>
+                    <div class="col-3 mb4">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;"
+                             alt="Logo"/>
+                    </div>
+                    <div class="col-3 offset-12" name="right_data">
+                        <strong>: Date التاريخ</strong>
+                        <br/>
+                        <strong>مجمع الدافنية الغذائي</strong>
+                        <br/>
+                        <strong>طلب سلفة مالية</strong>
+                        <br/>
+                    </div>
+                    <div class="col-9 text-end" style="margin-top:22px;" t-field="company.report_header" name="moto"/>
+                </div>
+                <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                    <div class="col-12">
+                        <div style="border-bottom: 1px solid black;"/>
+                    </div>
+                </div>
+            </div>
+
+            <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+                 t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+                 t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                 t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <div class="pt-5">
+                    <!-- This div ensures that the address is not cropped by the header. -->
+                    <t t-call="web.address_layout"/>
+                </div>
+                <t t-out="0"/>
+            </div>
+        </template>
+        <template id="cash_advance_request_template_report_view">
+            <t t-call="cash_advance_request.external_layout_standard_inherit">
+                <t t-set="o" t-value="o.with_context({'lang':o.employee_id.user_id.partner_id.lang})"/>
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div>
+                        <table class="table table-bordered" style="border: 2px solid;">
+                            <tr>
+                                <th>ID Code:</th>
+                                <th class="text-left">HEAD_2</th>
+                                <th class="text-right">HEAD_2</th>
+                                <th class="text-right">:الرقم الآلي</th>
+
+                            </tr>
+                        </table>
+
+                    </div>
+
+                    <table style="width:100%;margin:0px auto;background:white;border:1px solid ;" cellpadding="0"
+                           class="table table-bordered">
+                        <tr>
+                            <th style="text-align: left;">
+                                Name :
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                <strong>: الاسم</strong>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                ID No.
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :رقم مستند التعريف
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width:22%;text-align: left;">
+                                ID Type:
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;width:20%;">
+                                :نوع مستند التعريف
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Date of starting works:
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :تاريخ مباشرة العمل
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Organizational Division:
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :الجهة التابع لها
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Assigned Job:
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :الوظيفة المناطة به
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Salary / Wage:
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="float: left;"/>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :الراتب المحدد
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="text-align: left;">
+                                I would like to request your approval for:
+                            </th>
+                            <th colspan="2" style="text-align: right;">
+                                نأمل منكم التفضل بالموافقة على صرف سلفة مالية و قدرها
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Amount (numbers):
+                            </th>
+                            <th colspan="2">
+                                <span t-field="o.description" style="text-align: center;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :المبلغ المطلوب بالأرقام
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Currency:
+                            </th>
+                            <th style="width:25%;">
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th style="width:25%;">
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :نوع العملة
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="text-align: left;">
+                                Amount (words):
+                            </th>
+                            <th colspan="2" style="text-align: right;">
+                                :المبلغ المطلوب بالحروف
+                            </th>
+                        </tr>
+                        <tr rowspan="2">
+                            <th colspan="2">
+
+                                    <span t-field="o.description" style="text-align: center;"/>
+
+                            </th>
+                            <th colspan="2" style="text-align: right;">
+
+                                    <span t-field="o.description" style="text-align: center;"/>
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="text-align: left;">
+                                To be deducted through:
+                            </th>
+                            <th colspan="2" style="text-align: right;">
+                                على أن يتم استقطاعها على عدد
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Payment Number (words)
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                عدد الدفعات بالحروف
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Payment stars by:
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :تاريخ بداية السداد
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Payment ends by:
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :تاريخ نهاية السداد
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Beneficiary Signature:
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :توقيع مقدم الطلب
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Name of Manager:
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :اسم مدير الجهة
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left;">
+                                Signature of Manager:
+
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: left;"/>
+                            </th>
+                            <th>
+                                <span t-field="o.description" style="float: right;"/>
+                            </th>
+                            <th style="text-align: right;">
+                                :توقيع مدير الجهة
+                            </th>
+                        </tr>
+                    </table>
+                    <div>
+                        <strong style="float:left">Remarks of HR Division :</strong>
+                        <strong style="float:right;">:ملاحظات إدارة الموارد البشرية</strong>
+                    </div>
+                    <br/>
+
+                    <table style="width:100%;margin:0px auto;background:white;border:1px solid ;" cellpadding="0"
+                           class="table table-bordered">
+                        <tr>
+                            <td><br/></td>
+                            <th style="text-align:right;width:50%;">
+                                يتم متابعة استقطاع السلفة إلى أن يتم قفل حسابها
+                            </th>
+                        </tr>
+                        <tr>
+                            <td><br/></td>
+                            <td><br/></td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Signature of HR Director
+                            </th>
+                            <th>
+                                توقيع مدير إدارة الموارد البشرية
+                            </th>
+                        </tr>
+                    </table>
+                    <div>
+                        <strong style="float:left">Remarks of Financial Division:</strong>
+                        <strong style="float:right;">:ملاحظات الإدارة المالية</strong>
+                    </div>
+                    <br/>
+                    <table style="width:100%;margin:0px auto;background:white;border:1px solid ;"
+                           class="table table-bordered">
+                        <tr>
+                            <th><br/></th>
+                            <th style="text-align:right;">لا مانع من الصرف و متابعة الاستقطاع</th>
+                        </tr>
+                        <tr>
+                            <th><br/></th>
+                            <th><br/></th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Signature of Financial Director
+                            </th>
+                            <th>
+                                توقيع مدير الإدارة المالية
+                            </th>
+                        </tr>
+                    </table>
+                    <br/>
+                    <div>
+                        <strong style="float:left">Opinion of AFC Operations Manager</strong>
+                        <strong style="float:right;">رأي مدير عمليات المجمع</strong>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div style="border-bottom: 1px solid black;"/>
+                    <br/>
+                    <div style="border-bottom: 1px solid black;"/>
+                    <br/>
+
+                    <div class="text-center">
+                        <strong>اعتماد مدير عمليات المجمع</strong>
+                        <br/>
+                        <strong>Approval of Operations Manager of AFC</strong>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="cash_advance_request_report_template_id">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="cash_advance_request.cash_advance_request_template_report_view"
+                       t-lang="o.employee_id.user_id.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

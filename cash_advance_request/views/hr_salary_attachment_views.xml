@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record id="hr_salary_attachment_view_form_inherited" model="ir.ui.view">
+            <field name="name">hr.salary.attachment.form.inherited</field>
+            <field name="model">hr.salary.attachment</field>
+            <field name="inherit_id" ref="hr_payroll.hr_salary_attachment_view_form"/>
+            <field name="arch" type="xml">
+
+                <button name="action_done" position="before">
+                    <button string="Print Cash Advance Request"
+                            name="action_print"
+                            class="btn-primary"
+                            type="object"/>
+                </button>
+
+            </field>
+        </record>
+    </data>
+</odoo>

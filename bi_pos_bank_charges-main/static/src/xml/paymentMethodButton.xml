@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="bi_pos_bank_charges" inherit_id="point_of_sale.template" xml:space="preserve">
+
+
+    <t t-name="bi_pos_bank_charges.PaymentScreen" t-inherit="point_of_sale.PaymentScreen"
+       t-inherit-mode="extension" owl="1">
+        <xpath expr="//t[@t-foreach='payment_methods_from_config']" position="replace">
+            
+            <t t-foreach="payment_methods_from_config" t-as="paymentMethod"
+               t-key="paymentMethod.id">
+                <div class="button paymentmethod"
+                     t-on-click="() => this.trigger('new-payment-line', paymentMethod)">
+                    <div class="payment-name">
+
+
+                        <t t-if="paymentMethod.is_bank_charge">
+                            <t t-if="paymentMethod.cahrges_type == 'percentage'">
+                                <t t-esc="paymentMethod.name"/>
+                                <t t-esc="paymentMethod.cahrges_amount"/>%
+                            </t>
+                            <t t-else="">
+                                <t t-esc="paymentMethod.name"/>
+                                <t t-esc="paymentMethod.cahrges_amount"/>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <t t-esc="paymentMethod.name"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="PayBnkChargeUpdate" t-inherit="point_of_sale.PaymentScreen" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('back')]" position="replace">
+            <div class="button back"
+                 t-on-click="click_back">
+                <i class="fa fa-angle-double-left fa-fw"></i>
+                <span class="back_text">Back</span>
+            </div>
+        </xpath>
+    </t>
+
+
+    <t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('pos-receipt-amount')]" position="replace">
+            <div class="pos-receipt-amount">
+                TOTAL
+                <span t-esc="env.pos.format_currency(receipt.total_with_tax + receipt.total_bank_charge)"
+                      class="pos-receipt-right-align"/>
+            </div>
+        </xpath>
+    </t>
+
+
+    <t t-name="PaymentScreenPaymentLines" t-inherit="point_of_sale.PaymentScreenPaymentLines" t-inherit-mode="extension"
+       owl="1">
+        <xpath expr="//t[@t-if='line.selected']/div[hasclass('paymentline')]/div[hasclass('payment-amount')]"
+               position="before">
+            <t t-if="line.payment_method.is_bank_charge">
+                <t t-if="line.currency_amount > 0">
+                    <div class="payment-amount">
+                        <span>Total Card Charges: </span>
+                        (<t t-esc="(line.currency_amount + line.amount).toFixed(2)"/>)
+                    </div>
+                    <div class="payment-amount">
+                        (<t t-esc="(line.currency_amount).toFixed(2)"/>)
+                    </div>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//t[@t-else='']/div[hasclass('paymentline')]/div[hasclass('payment-amount')]" position="before">
+            <t t-if="line.payment_method.is_bank_charge">
+                <t t-if="line.currency_amount > 0">
+                    <div class="payment-amount">
+                        <span>Total Card Charges: </span>
+                        (<t t-esc="(line.currency_amount + line.amount).toFixed(2)"/>)
+                    </div>
+                    <div class="payment-amount">
+                        (<t t-esc="(line.currency_amount).toFixed(2)"/>)
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </t>
+
+    <t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+        <xpath expr="//t[@t-foreach='receipt.paymentlines']" position="replace">
+            <t t-foreach="receipt.paymentlines" t-as="line" t-key="line.cid">
+                <div>
+                    <t t-esc="line.name"/>
+                    <span class="pos-receipt-right-align">
+                        <t t-esc="env.pos.format_currency_no_symbol(line.amount)"/>
+                        (<t t-esc="env.pos.format_currency_no_symbol(line.currency_amount)"/>)
+                    </span>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+
+    <t t-name="PaymentScreenStatus" t-inherit="point_of_sale.PaymentScreenStatus" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('payment-status-total-due')]" position="after">
+            
+            <div class="payment-status-total-due">
+                <span class="label">Total Bank Charges</span>
+                <span>
+                    <t t-esc="totalBankCharge"/>
+                </span>
+            </div>
+            <div>
+                 <span class="label">GRAND TOTAL: </span>
+                <span>
+                    <t t-esc="allTheTotal"/>
+                </span>
+            </div>
+        </xpath>
+    </t>
+
+</templates>
+    
+    

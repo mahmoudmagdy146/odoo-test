@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Receipt template for payment charges -->
+    <t t-name="point_of_sale.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('pos-receipt-amount')]" position="after">
+            <t t-if="receipt.payment_charges and receipt.payment_charges.length > 0">
+                <div class="pos-receipt-charges">
+                    <br/>
+                    <div class="pos-receipt-center-align">Payment Charges</div>
+                    <div class="pos-receipt-center-align">................................</div>
+                    <t t-foreach="receipt.payment_charges" t-as="charge" t-key="charge_index">
+                        <div class="pos-receipt-charge-line">
+                            <span t-esc="charge.product_name"/>
+                            <span class="pos-receipt-right-align" t-esc="env.utils.formatCurrency(charge.amount)"/>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </t>
+
+</templates>

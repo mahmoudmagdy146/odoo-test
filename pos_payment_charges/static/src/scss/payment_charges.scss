@@ -1,0 +1,42 @@
+.payment-method-charge {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.payment-charge-indicator {
+    font-size: 0.9em;
+    color: #17a2b8;
+    margin-left: 5px;
+}
+
+.pos-receipt-charges {
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px dashed #000;
+}
+
+.pos-receipt-charge-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 0;
+    font-size: 0.9em;
+}
+
+.pos-receipt-center-align {
+    text-align: center;
+    font-weight: bold;
+}
+
+.pos-receipt-right-align {
+    text-align: right;
+}
+
+.payment-method-button.has-charge {
+    border-left: 3px solid #17a2b8;
+}
+
+.payment-method-button.has-charge:hover {
+    background-color: #f8f9fa;
+}

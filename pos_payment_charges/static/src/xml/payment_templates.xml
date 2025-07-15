@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Template for payment method with charges -->
+    <t t-name="pos_payment_charges.PaymentMethodWithCharges" owl="1">
+        <div class="payment-method-button" t-att-class="{'has-charge': chargeInfo}" t-on-click="onClick">
+            <div class="payment-method-name">
+                <t t-esc="props.paymentMethod.name"/>
+            </div>
+            <div t-if="chargeInfo" class="payment-method-charge">
+                <t t-esc="chargeInfo"/>
+            </div>
+        </div>
+    </t>
+
+    <!-- Extend existing payment method button template -->
+    <t t-name="point_of_sale.PaymentScreenPaymentLines" t-inherit="point_of_sale.PaymentScreenPaymentLines" t-inherit-mode="extension">
+        <xpath expr="//t[@t-if='line.selected']/div[hasclass('paymentline')]/div/span[hasclass('payment-name')]" position="inside">
+            <span t-if="props.line.payment_method.charge_type !== 'none'" class="payment-charge-indicator">
+                <t t-if="props.line.payment_method.charge_type === 'percentage'">
+                    (+<t t-esc="props.line.payment_method.charge_amount"/>%)
+                </t>
+                <t t-if="props.line.payment_method.charge_type === 'fixed'">
+                    (+<t t-esc="env.utils.formatCurrency(props.line.payment_method.charge_amount)"/>)
+                </t>
+            </span>
+        </xpath>
+        <xpath expr="//t[@t-else='']/div[hasclass('paymentline')]/div/div[hasclass('payment-amount')]" position="before">
+            <span t-if="props.line.payment_method.charge_type !== 'none'" class="payment-charge-indicator">
+                <t t-if="props.line.payment_method.charge_type === 'percentage'">
+                    (+<t t-esc="props.line.payment_method.charge_amount"/>%)
+                </t>
+                <t t-if="props.line.payment_method.charge_type === 'fixed'">
+                    (+<t t-esc="env.utils.formatCurrency(props.line.payment_method.charge_amount)"/>)
+                </t>
+            </span>
+        </xpath>
+    </t>
+
+</templates>

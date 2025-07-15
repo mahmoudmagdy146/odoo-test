@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_payment_method_form_charges" model="ir.ui.view">
+        <field name="name">pos.payment.method.form.charges</field>
+        <field name="model">pos.payment.method</field>
+        <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='split_transactions']" position="after">
+                <separator string="Payment Charges" colspan="2"/>
+                <field name="charge_type"/>
+                <field name="charge_amount" invisible="charge_type == 'none'" required="charge_type  != 'none'"/>
+                <field name="charge_account_id" invisible="charge_type == 'none'" required="charge_type  != 'none'"/>
+                <field name="charge_product_id" invisible="charge_type == 'none'" required="charge_type  != 'none'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pos_order_line_form_charges" model="ir.ui.view">
+        <field name="name">pos.order.line.form.charges</field>
+        <field name="model">pos.order.line</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='discount']" position="after">
+                <field name="is_payment_charge"/>
+                <field name="payment_method_id" invisible="not is_payment_charge"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

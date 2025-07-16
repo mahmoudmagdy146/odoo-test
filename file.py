@@ -14,8 +14,6 @@ class StockMovementCustomHandler(models.AbstractModel):
 
         lines = report._regroup_lines_by_name_prefix(options, partner_lines,
                                                      '_report_expand_unfoldable_line_partner_ledger_prefix_group', 0)
-
-        # Inject sequence on dynamic lines
         lines = [(0, line) for line in lines]
 
         # Report total line.
@@ -146,9 +144,6 @@ class StockMovementCustomHandler(models.AbstractModel):
         return {
             'initial_balances': self._get_initial_balance_values(partner_ids_to_expand,
                                                                  options) if partner_ids_to_expand else {},
-
-            # load_more_limit cannot be passed to this call, otherwise it won't be applied per partner but on the whole result.
-            # We gain perf from batching, but load every result, even if the limit restricts them later.
             'aml_values': self._get_aml_values(options, partner_ids_to_expand) if partner_ids_to_expand else {},
         }
 
@@ -165,17 +160,6 @@ class StockMovementCustomHandler(models.AbstractModel):
         }
 
     def _query_partners(self, options):
-        """ Executes the queries and performs all the computation.
-        :return:        A list of tuple (partner, column_group_values) sorted by the table's model _order:
-                        - partner is a res.parter record.
-                        - column_group_values is a dict(column_group_key, fetched_values), where
-                            - column_group_key is a string identifying a column group, like in options['column_groups']
-                            - fetched_values is a dictionary containing:
-                                - sum:                              {'debit': float, 'credit': float, 'balance': float}
-                                - (optional) initial_balance:       {'debit': float, 'credit': float, 'balance': float}
-                                - (optional) lines:                 [line_vals_1, line_vals_2, ...]
-        """
-
         def assign_sum(row):
             fields_to_assign = ['balance', 'debit', 'credit']
             # if any(not company_currency.is_zero(row[field]) for field in fields_to_assign):
@@ -230,21 +214,7 @@ class StockMovementCustomHandler(models.AbstractModel):
                 continue
 
             assign_sum(row)
-        # print("TESTRESssssss222", totals, '+', groupby_partners)
 
-        # if None in groupby_partners:
-        #     # Debit/credit are inverted for the unknown partner as the computation is made regarding the balance of the known partner
-        #     for column_group_key in options['column_groups']:
-        #         groupby_partners[None][column_group_key]['main_uom_qty'] += totals['main_uom_qty'][column_group_key]
-        #         groupby_partners[None][column_group_key]['unit_cost'] += totals['unit_cost'][column_group_key]
-        #         groupby_partners[None][column_group_key]['debit'] += totals['credit'][column_group_key]
-        #         groupby_partners[None][column_group_key]['credit'] += totals['debit'][column_group_key]
-        #         groupby_partners[None][column_group_key]['balance'] -= totals['balance'][column_group_key]
-
-        # Retrieve the partners to browse.
-        # groupby_partners.keys() contains all account ids affected by:
-        # - the amls in the current period.
-        # - the amls affecting the initial balance.
         if groupby_partners:
             # Note a search is done instead of a browse to preserve the table ordering.
             partners = self.env['product.product'].with_context(active_test=False).search(
@@ -338,20 +308,9 @@ class StockMovementCustomHandler(models.AbstractModel):
             return result, result['opening_stock'] if result else opening_stock
 
     def _get_query_sums(self, options):
-        """
-        Construct a query retrieving all the aggregated sums to build the report.
-        It includes sums for all partners and sums for the initial balances.
-
-        :param options: The report options.
-        :return: (query, params)
-        """
         params = []
         queries = []
         report = self.env.ref('stock_movement_report.stock_mv_report')
-
-        # Create the currency table query
-        # ct_query = self.env['res.currency']._get_query_currency_table(options)
-
         column_groups = report._split_options_per_column_group(options)
         date_from = f"{options['date']['date_from']} 00:00:00"
         date_to = f"{options['date']['date_to']} 23:59:59"
@@ -741,18 +700,6 @@ class StockMovementCustomHandler(models.AbstractModel):
 
         return init_balance_by_col_group
         # return final_query, params
-
-    def _get_options_initial_balance(self, options):
-        """ Create options used to compute the initial balances for each partner.
-        The resulting dates domain will be:
-        [('date' <= options['date_from'] - 1)]
-        :param options: The report options.
-        :return:        A copy of the options, modified to match the dates to use to get the initial balances.
-        """
-        date_from = options['date']['date_from'] + ' 00:00:00'
-        new_date_to = fields.Date.from_string(date_from) - timedelta(days=1)
-        new_date_options = dict(options['date'], date_from=False, date_to=fields.Date.to_string(new_date_to))
-        return dict(options, date=new_date_options)
 
     def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset,
                                                       unfold_all_batch_data=None):
@@ -1148,11 +1095,3 @@ class StockMovementCustomHandler(models.AbstractModel):
             'level': 1,
             'columns': column_values,
         }
-
-    def open_journal_items(self, options, params):
-        params['view_ref'] = 'account.view_move_line_tree_grouped_partner'
-        action = self.env['account.report'].open_journal_items(options=options, params=params)
-        action.get('context', {}).update({'search_default_group_by_account': 0, 'search_default_group_by_partner': 1})
-        product_id = self.env['account.report']._parse_line_id(params.get('line_id'))[-1][2]
-        action['domain'] = [('move_id.stock_move_id.product_id.id','=',int(product_id))]
-        return action
